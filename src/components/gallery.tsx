@@ -21,7 +21,7 @@ export function Gallery({ urls }: { urls: string[] }) {
 
   if (urls.length === 0) {
     return (
-        <div className="text-center mt-20 text-muted-foreground border-2 border-dashed rounded-lg p-12">
+        <div className="text-center mt-16 sm:mt-20 text-muted-foreground border-2 border-dashed rounded-lg p-8 sm:p-12">
             <p className="font-medium">Your uploaded images will appear here.</p>
             <p className="text-sm">Start by uploading an image above.</p>
         </div>
@@ -29,9 +29,9 @@ export function Gallery({ urls }: { urls: string[] }) {
   }
 
   return (
-    <section className="mt-20">
-      <h2 className="text-3xl font-bold text-center mb-8">Your Gallery</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <section className="mt-16 sm:mt-20">
+      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">Your Gallery</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         {urls.map((url, index) => (
           <Card key={`${url}-${index}`} className="overflow-hidden group relative animate-in fade-in-0 zoom-in-95 duration-500">
             <CardContent className="p-0">

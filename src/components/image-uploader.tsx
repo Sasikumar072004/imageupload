@@ -114,22 +114,22 @@ export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: stri
 
   return (
     <Card className="w-full max-w-xl mx-auto shadow-xl border-2 border-primary/10 rounded-2xl">
-      <CardContent className="p-8">
+      <CardContent className="p-4 sm:p-8">
         <form onSubmit={handleSubmit}>
           { !file && !isUploading && (
             <div
               className={cn(
-                "flex justify-center items-center flex-col w-full h-56 border-2 border-dashed rounded-xl cursor-pointer transition-colors duration-300",
+                "flex justify-center items-center flex-col w-full h-48 sm:h-56 border-2 border-dashed rounded-xl cursor-pointer transition-colors duration-300",
                 isDragging ? "border-primary bg-primary/10" : "border-border hover:border-primary/50 hover:bg-accent"
               )}
               onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              <UploadCloud className="w-12 h-12 text-muted-foreground mb-4" />
-              <p className="mb-2 text-lg font-medium text-foreground">
+              <UploadCloud className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mb-4" />
+              <p className="mb-2 text-base sm:text-lg font-medium text-foreground">
                 <span className="font-bold text-primary">Click to upload</span> or drag and drop
               </p>
-              <p className="text-sm text-muted-foreground">PNG, JPG, or GIF (max. 10MB)</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">PNG, JPG, or GIF (max. 10MB)</p>
               <input ref={fileInputRef} id="image-upload" name="image" type="file" className="hidden" accept="image/png, image/jpeg, image/gif" onChange={handleFileChange} />
             </div>
           )}
@@ -139,11 +139,11 @@ export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: stri
                 <div className="relative aspect-video rounded-lg overflow-hidden border-2 border-dashed w-full mx-auto">
                     {preview && <Image src={preview} alt="Image preview" fill className="object-contain" />}
                 </div>
-                <div className="flex items-center justify-center gap-2 text-foreground font-medium">
+                <div className="flex items-center justify-center gap-2 text-foreground font-medium text-sm sm:text-base">
                     <ImageIcon className="w-5 h-5" />
                     <span>{file.name}</span>
                 </div>
-                <div className="flex gap-2 justify-center pt-4">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center pt-4">
                     <Button type="submit" size="lg">
                         {isUploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</> : "Confirm and Upload"}
                     </Button>

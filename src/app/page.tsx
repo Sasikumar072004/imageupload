@@ -14,15 +14,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
-      <main className="container mx-auto px-4 py-16 sm:py-24">
-        <header className="text-center mb-16">
+      <main className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
+        <header className="text-center mb-12 md:mb-16">
           <div className="inline-flex items-center justify-center bg-primary/10 text-primary p-2 rounded-full mb-4">
             <Sparkles className="h-6 w-6" />
           </div>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tighter text-foreground">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter text-foreground">
             Asset Storage
           </h1>
-          <p className="mt-4 max-w-xl mx-auto text-lg text-muted-foreground">
+          <p className="mt-4 max-w-xl mx-auto text-base sm:text-lg text-muted-foreground">
             A simple, fast, and reliable way to upload your images and get a shareable link instantly.
           </p>
         </header>
