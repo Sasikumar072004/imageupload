@@ -2,25 +2,39 @@
 
 export async function uploadImage(formData: FormData): Promise<{ success: boolean; url?: string; error?: string }> {
   const file = formData.get('image') as File;
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
   if (!file || file.size === 0) {
     return { success: false, error: 'No image file provided.' };
   }
+  
+  if (!cloudName || !uploadPreset) {
+    console.error('Cloudinary environment variables are not set.');
+    return { success: false, error: 'Server configuration error.' };
+  }
+  
+  const uploadFormData = new FormData();
+  uploadFormData.append('file', file);
+  uploadFormData.append('upload_preset', uploadPreset);
 
-  // Simulate a delay for the upload process
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  try {
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: 'POST',
+      body: uploadFormData,
+    });
+    
+    const data = await response.json();
 
-  // In a real application, you would upload the file to Cloudinary here.
-  // For this simulation, we'll just return a placeholder URL.
-  // const cloudinary = require('cloudinary').v2;
-  // cloudinary.config({ ... });
-  // const result = await cloudinary.uploader.upload(file.path, { ... });
-  // return { success: true, url: result.secure_url };
+    if (!response.ok || data.error) {
+      console.error('Cloudinary upload error:', data.error);
+      return { success: false, error: data.error?.message || 'Failed to upload image.' };
+    }
+    
+    return { success: true, url: data.secure_url };
 
-  console.log('Simulating upload for file:', file.name);
-
-  // Return a placeholder image
-  const placeholderUrl = 'https://placehold.co/800x600.png';
-
-  return { success: true, url: placeholderUrl };
+  } catch (error) {
+    console.error('Error uploading to Cloudinary:', error);
+    return { success: false, error: 'An unexpected error occurred during upload.' };
+  }
 }
