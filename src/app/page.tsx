@@ -20,7 +20,7 @@ export default function Home() {
             <Sparkles className="h-6 w-6" />
           </div>
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tighter text-foreground">
-            CloudiShare
+            Asset Storage
           </h1>
           <p className="mt-4 max-w-xl mx-auto text-lg text-muted-foreground">
             A simple, fast, and reliable way to upload your images and get a shareable link instantly.

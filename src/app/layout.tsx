@@ -9,7 +9,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'CloudiShare',
+  title: 'Asset Storage',
   description: 'A minimalist web app for uploading images and getting shareable URLs.',
 };
 
