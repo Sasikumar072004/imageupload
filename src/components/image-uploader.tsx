@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect, type DragEvent, type FormEvent } from "react";
@@ -136,7 +137,7 @@ export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: stri
           { file && !isUploading && (
              <div className="space-y-4 text-center">
                 <div className="relative aspect-video rounded-lg overflow-hidden border-2 border-dashed w-full mx-auto">
-                    <Image src={preview!} alt="Image preview" fill className="object-contain" />
+                    {preview && <Image src={preview} alt="Image preview" fill className="object-contain" />}
                 </div>
                 <div className="flex items-center justify-center gap-2 text-foreground font-medium">
                     <ImageIcon className="w-5 h-5" />
