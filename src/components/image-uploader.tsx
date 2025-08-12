@@ -7,14 +7,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, Copy, Check, Loader2, X } from "lucide-react";
+import { UploadCloud, Copy, Check, Loader2, X, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: string) => void }) {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -41,17 +43,21 @@ export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: stri
     e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-      setUploadedUrl(null);
+      handleFile(e.dataTransfer.files[0]);
     }
   };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setUploadedUrl(null);
+      handleFile(e.target.files[0]);
     }
   };
+
+  const handleFile = (selectedFile: File) => {
+    setFile(selectedFile);
+    setUploadedUrl(null);
+    setUploadProgress(0);
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,7 +67,21 @@ export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: stri
     const formData = new FormData();
     formData.append('image', file);
 
+    // Simulate progress for better UX
+    const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+            if (prev >= 95) {
+                clearInterval(progressInterval);
+                return prev;
+            }
+            return prev + 5;
+        })
+    }, 100);
+
     const result = await uploadImage(formData);
+    clearInterval(progressInterval);
+    setUploadProgress(100);
+
     setIsUploading(false);
 
     if (result.success && result.url) {
@@ -70,6 +90,7 @@ export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: stri
       setFile(null);
     } else {
       toast({ variant: "destructive", title: "Upload Failed", description: result.error });
+      setUploadProgress(0);
     }
   };
   
@@ -83,57 +104,75 @@ export function ImageUploader({ onUploadSuccess }: { onUploadSuccess: (url: stri
 
   const removeFile = () => {
     setFile(null);
+    setPreview(null);
+    setUploadProgress(0);
     if(fileInputRef.current) {
         fileInputRef.current.value = "";
     }
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto shadow-lg border-2 border-primary/10">
-      <CardContent className="p-6">
+    <Card className="w-full max-w-xl mx-auto shadow-xl border-2 border-primary/10 rounded-2xl">
+      <CardContent className="p-8">
         <form onSubmit={handleSubmit}>
-          {preview ? (
-            <div className="space-y-4">
-              <div className="relative aspect-video rounded-lg overflow-hidden border">
-                <Image src={preview} alt="Image preview" fill className="object-contain" />
-                <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full" onClick={removeFile}>
-                  <X className="h-4 w-4" />
-                   <span className="sr-only">Remove image</span>
-                </Button>
-              </div>
-            </div>
-          ) : (
+          { !file && !isUploading && (
             <div
               className={cn(
-                "flex justify-center items-center flex-col w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
-                isDragging ? "border-primary bg-accent/50" : "border-border hover:border-primary/50"
+                "flex justify-center items-center flex-col w-full h-56 border-2 border-dashed rounded-xl cursor-pointer transition-colors duration-300",
+                isDragging ? "border-primary bg-primary/10" : "border-border hover:border-primary/50 hover:bg-accent"
               )}
               onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              <UploadCloud className="w-10 h-10 text-muted-foreground mb-2" />
-              <p className="mb-2 text-sm text-muted-foreground">
-                <span className="font-semibold text-primary">Click to upload</span> or drag and drop
+              <UploadCloud className="w-12 h-12 text-muted-foreground mb-4" />
+              <p className="mb-2 text-lg font-medium text-foreground">
+                <span className="font-bold text-primary">Click to upload</span> or drag and drop
               </p>
-              <p className="text-xs text-muted-foreground">PNG, JPG, or GIF</p>
+              <p className="text-sm text-muted-foreground">PNG, JPG, or GIF (max. 10MB)</p>
               <input ref={fileInputRef} id="image-upload" name="image" type="file" className="hidden" accept="image/png, image/jpeg, image/gif" onChange={handleFileChange} />
             </div>
           )}
-          
-          <div className="mt-6">
-            <Button type="submit" disabled={isUploading || !file} className="w-full">
-              {isUploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</> : "Upload Image"}
-            </Button>
-          </div>
+
+          { file && !isUploading && (
+             <div className="space-y-4 text-center">
+                <div className="relative aspect-video rounded-lg overflow-hidden border-2 border-dashed w-full mx-auto">
+                    <Image src={preview!} alt="Image preview" fill className="object-contain" />
+                </div>
+                <div className="flex items-center justify-center gap-2 text-foreground font-medium">
+                    <ImageIcon className="w-5 h-5" />
+                    <span>{file.name}</span>
+                </div>
+                <div className="flex gap-2 justify-center pt-4">
+                    <Button type="submit" size="lg">
+                        {isUploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</> : "Confirm and Upload"}
+                    </Button>
+                    <Button variant="outline" onClick={removeFile}>Cancel</Button>
+                </div>
+            </div>
+          )}
+
+           { isUploading && (
+              <div className="w-full text-center space-y-4 flex flex-col items-center">
+                  <p className="font-semibold text-lg">Uploading your file...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-primary"/>
+                  <Progress value={uploadProgress} className="w-full max-w-sm" />
+                  <p className="text-sm text-muted-foreground">{file?.name}</p>
+              </div>
+          )}
         </form>
 
         {uploadedUrl && (
-          <div className="mt-6 space-y-2 animate-in fade-in duration-500">
-            <p className="text-sm font-medium text-center">Upload successful! Here is your URL:</p>
-            <div className="flex items-center space-x-2">
-              <Input value={uploadedUrl} readOnly className="text-sm" />
+          <div className="mt-6 space-y-3 animate-in fade-in duration-500 text-center">
+            <div className="flex justify-center">
+              <div className="bg-green-100 text-green-700 p-2 rounded-full">
+                <Check className="h-6 w-6" />
+              </div>
+            </div>
+            <p className="text-lg font-medium text-center">Upload successful!</p>
+            <div className="flex items-center space-x-2 max-w-md mx-auto">
+              <Input value={uploadedUrl} readOnly className="text-sm bg-secondary border-secondary" />
               <Button variant="outline" size="icon" onClick={handleCopy}>
-                {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                {isCopied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                 <span className="sr-only">Copy URL</span>
               </Button>
             </div>
