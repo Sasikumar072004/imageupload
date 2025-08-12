@@ -32,7 +32,6 @@ export default function Home() {
         <Gallery urls={imageUrls} />
       </main>
       <footer className="text-center py-6 border-t">
-        <p className="text-sm text-muted-foreground">Built with Next.js and Firebase Studio</p>
       </footer>
     </div>
   );
